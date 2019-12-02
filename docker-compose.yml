@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  traefik:
+    image: traefik:2.0
+    container_name: global_traefik
+    restart: "always"
+    ports:
+      # Port 443 is used for HTTPS trafic
+      - "4000:4000"
+      # Port 8080 is used for traefik's own dashboard
+      - "5000:8080"
+    volumes:
+      # Here is the mount of the traefik config
+      - ./traefik.toml:/etc/traefik/traefik.toml:ro
+      # The docker socket is mounted for auto-discovery of new services
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      # Attach the traefik container to the default network (which is the global "gateway" network)
+      - default
+
+# Make the externally created network "gateway" available as network "default"
+networks:
+  default:
+    external:
+      name: gateway
